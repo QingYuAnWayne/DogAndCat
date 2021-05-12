@@ -57,7 +57,6 @@ def train(**kwargs):
     for epoch in range(opt.max_epoch):
         loss_meter.reset()
         confusion_matrix.reset()
-        loss = None
 
         for ii, (data, label) in enumerate(train_dataloader):
             input = t.Tensor(data)
@@ -71,8 +70,32 @@ def train(**kwargs):
             loss.backward()
             optimizer.step()
 
-        # 更新统计指标和可视化
-        loss_meter.add(loss.data[0])
+            # 更新统计指标和可视化
+            loss_meter.add(loss.data[0])
+            confusion_matrix.add(score.data, target.data)
+            if ii % opt.print_feq == opt.print_feq - 1:
+                vis.plot("loss", loss_meter.value()[0])
+
+        model.save()
+
+        # 计算验证集上的指标及可视化
+        val_cm, val_accuracy = val(model, val_dataloader)
+        vis.plot('val_accuracy', val_accuracy)
+        vis.log("epoch:{epoch},lr:{lr},loss:{loss},train_cm:{train_cm},val_cm:{val_cm}"
+            .format(
+            epoch=epoch,
+            loss=loss_meter.value()[0],
+            val_cm=str(val_cm.value()),
+            train_cm=str(confusion_matrix.value()),
+            lr=lr))
+
+        # 如果损失不再下降，则降低学习率
+        if loss_meter.value()[0] > previous_loss:
+            lr = lr * opt.lr_decay
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = lr
+
+        previous_loss = loss_meter.value()[0]
 
 
 def val(model, dataloader):
