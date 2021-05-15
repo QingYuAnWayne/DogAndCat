@@ -7,12 +7,13 @@ class DefaultConfig(object):
 
     train_data_root = './data/train/'
     test_data_root = './data/test1'
-    load_model_path = 'checkpoints/model.pth'
+    # load_model_path = 'checkpoints/model.pth'
+    load_model_path = None
 
-    batch_size = 128
+    batch_size = 8
     use_gpu = False
-    num_workers = 4
-    print_feq = 20
+    num_workers = 1
+    print_feq = 1
 
     debug_file = '/tmp/debug'
     result_file = 'result.csv'

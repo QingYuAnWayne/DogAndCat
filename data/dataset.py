@@ -3,6 +3,7 @@ from PIL import Image
 from torch.utils import data
 import numpy as np
 from torchvision import transforms as T
+from math import ceil
 
 
 class DogCat(data.Dataset):
@@ -29,9 +30,9 @@ class DogCat(data.Dataset):
         if self.test:
             self.imgs = imgs
         elif train:
-            self.imgs = imgs[:0.7 * imgs_num]
+            self.imgs = imgs[:ceil(0.7 * imgs_num)]
         else:
-            self.imgs = imgs[0.7 * imgs_num:]
+            self.imgs = imgs[ceil(0.7 * imgs_num):]
 
         if transforms is None:
             # 数据转换操作，测试验证和训练的数据转换有所区别
